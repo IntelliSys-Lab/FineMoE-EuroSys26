@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "finemoe"
+version = "0.0.1"
+description = "Fine-grained expert offloading for Qwen MoE inference"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+license = "Apache-2.0"
+dependencies = [
+    "torch==2.10.0",
+    "flash-linear-attention==0.5.2",
+    "transformers==5.17.0",
+    "accelerate==1.15.0",
+    "numpy>=1.26,<3",
+    "safetensors>=0.4.3",
+    "matplotlib>=3.8",
+]
+
+[project.urls]
+Repository = "https://github.com/IntelliSys-Lab/FineMoE-EuroSys26"
+
+[tool.uv]
+environments = ["sys_platform == 'linux' and platform_machine == 'x86_64'"]
+cache-keys = [{file = "pyproject.toml"}, {file = "finemoe/csrc/*"}]
+
+[tool.uv.sources]
+torch = {index = "pytorch-cu126"}
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.setuptools.packages.find]
+include = ["finemoe*"]
+
+[[tool.setuptools.ext-modules]]
+name = "finemoe._cache"
+sources = ["finemoe/csrc/cache.cpp", "finemoe/csrc/bindings.cpp"]
+depends = ["finemoe/csrc/cache.h", "finemoe/csrc/cuda_runtime.h"]
+language = "c++"
+extra-compile-args = ["-O3", "-g0", "-std=c++17"]
+libraries = ["dl"]
+
+[tool.setuptools.package-data]
+finemoe = ["csrc/*.h"]

@@ -1,0 +1,4 @@
+include README.md LICENSE
+include uv.lock
+recursive-include demo *.py
+include demo/states/lmsys-chat-1m~eval_prompts.json
